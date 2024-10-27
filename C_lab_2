@@ -1,0 +1,199 @@
+#define _CRT_SECURE_NO_WARNINGS
+#define Right 20
+#define Left 0
+#include<stdio.h>
+#include<stdlib.h>
+
+int scanMatr(int** m, int rows, int cols) //функция для ввода матриц
+{
+	int i, j, x;
+	for (i = 0;i < rows;i++)
+	{
+		for (j = 0;j < cols;j++)
+		{
+			x = scanf("%d", &m[i][j]);
+			if (x == 0)
+				return 0;
+		}
+	}
+	return 1;
+}
+
+int checkCol(int** m, int col, int rows) //функция для проверки столбца на выполнение условий
+{
+	int i;
+	for (i = 0;i < rows;i++)
+	{
+		if (m[i][col] < 0)
+		{
+			return 0;
+		}
+	}
+	for (i = 1;i < rows;i++)
+	{
+		if (m[i][col] >= m[i - 1][col])
+		{
+			return 0;
+		}
+	}
+	return 1;
+}
+
+int foolCheckRC() //функция проверки на ввод пользователем числа (для количества рядов и строк)
+{
+	int num, x;
+	char buf;
+	printf("Vvedite tseloe chislo ot %d do %d:\n", Left, Right);
+	while (1)
+	{
+		x = scanf("%d", &num);
+		if (x)
+		{
+			if (num <= Right && num > Left)
+			{
+				printf("Chislo prinyato.\n");
+				return num;
+			}
+			printf("Chislo dolzno bit ot %d do %d.\n", Left, Right);
+		}
+		else
+		{
+			scanf("%c", &buf);
+			printf("Vvedite chislo.\n");
+		}
+	}
+}
+
+int maxCol(int** m, int rows, int cols) //поиск максимального столбца подходящего под условия
+{
+	int j, numcol = -1;
+	for (j = 0;j < cols;j++)
+	{
+		if (checkCol(m, j, rows))
+		{
+			numcol = j;
+		}
+	}
+	return numcol;
+}
+
+void appendNewMatr(int** m, int** new_m, int rows, int cols) //функция для создания матрицы B
+{
+	int i, j, col_to_delete;
+	col_to_delete = maxCol(m, rows, cols);
+	for (i = 0; i < rows; i++)
+	{
+		for (j = 0; j < cols; j++)
+		{
+			if (j < col_to_delete)
+			{
+				new_m[i][j] = m[i][j];
+			}
+			else
+			{
+				if (j > col_to_delete)
+				{
+					new_m[i][j - 1] = m[i][j];
+				}
+			}
+		}
+	}
+	return;
+}
+
+void printMatr(int** m, int rows, int cols) //функция для вывода матриц
+{
+	int i, j, x;
+	for (i = 0;i < rows;i++)
+	{
+		for (j = 0;j < cols;j++)
+		{
+			printf("%d ", m[i][j]);
+		}
+		printf("\n");
+	}
+	return;
+}
+
+void freePamat(int** m, int rows) //функция для очистки памяти
+{
+	int i;
+	for (i = 0;i < rows;i++) 
+	{
+		free(m[i]);
+	}
+	free(m);
+	return;
+}
+
+
+int main()
+{
+	int **m, **new_matr, r, c, i;
+	
+	printf("Vvedite kolichestvo strok v matritse:\n"); //ввод количество строк и столбцов
+	r = foolCheckRC();
+	printf("Vvedite kolichestvo stolbtsov v matritse:\n");
+	c = foolCheckRC();
+	
+	m = (int**)malloc(sizeof(int*) * r); //память для всей матрицы
+	if (m == NULL)
+	{
+		printf("ERROR: Ne ydalos videlit pamat.");
+		return 0;
+	}
+	for (i = 0;i < r;i++) //выделение памяти под каждую строку
+	{
+		m[i] = (int*)malloc(sizeof(int*) * c);
+		if (m[i] == NULL)
+		{
+			printf("ERROR: Ne ydalos videlit pamat.");
+			return 0;
+		}
+	}
+
+	printf("Vvedite matritsy A:\n");
+	if (!scanMatr(m, r, c)) //ввод матрицы A с проверкой
+	{
+		printf("ERROR: matritsa dolzhna sostoyat iz tselix chisel.");
+		return 0;
+	}
+
+	if (maxCol(m, r, c) == -1) //проверка: можно ли построить матрицу B
+	{
+		printf("ERROR: ne ydalos postroit B: net podxodyashego stolbtsa dlya ydalenia.\n");
+		printf("Isxodnaya matritsa:\n");
+		printMatr(m, r, c);
+		freePamat(m, r); //очистка памяти под матрицу A если нельзя построить B
+		return 0;
+	}
+	
+	new_matr = (int**)malloc(sizeof(int*) * r); //память для всей новой матрицы
+	if (new_matr == NULL)
+	{
+		printf("ERROR: Ne ydalos videlit pamat.");
+		freePamat(m, r); //очистка памяти для матрицы A если под B нельзя выделить
+		return 0;
+	}
+	for (i = 0;i < r;i++) //выделение памяти под каждую строку
+	{
+		new_matr[i] = (int*)malloc(sizeof(int*) * (c - 1));
+		if (new_matr[i] == NULL)
+		{
+			printf("ERROR: Ne ydalos videlit pamat.");
+			freePamat(m, r); //очистка памяти для матрицы A если под B нельзя выделить
+			return 0;
+		}
+	}
+
+	appendNewMatr(m, new_matr, r, c);
+	
+	freePamat(m, r); //очистка памяти под матрицу A
+
+	printf("Matritsa B:\n"); //вывод матрицы B
+	printMatr(new_matr, r, c - 1);
+
+	freePamat(new_matr, r); //очистка памяти под матрицу B
+
+	return 0;
+}
