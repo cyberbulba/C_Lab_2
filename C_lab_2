@@ -7,9 +7,9 @@
 int scanMatr(int** m, int rows, int cols) //функция для ввода матриц
 {
 	int i, j, x;
-	for (i = 0;i < rows;i++)
+	for (i = 0; i < rows; i++)
 	{
-		for (j = 0;j < cols;j++)
+		for (j = 0; j < cols; j++)
 		{
 			x = scanf("%d", &m[i][j]);
 			if (x == 0)
@@ -22,14 +22,14 @@ int scanMatr(int** m, int rows, int cols) //функция для ввода м�
 int checkCol(int** m, int col, int rows) //функция для проверки столбца на выполнение условий
 {
 	int i;
-	for (i = 0;i < rows;i++)
+	for (i = 0; i < rows; i++)
 	{
 		if (m[i][col] < 0)
 		{
 			return 0;
 		}
 	}
-	for (i = 1;i < rows;i++)
+	for (i = 1; i < rows; i++)
 	{
 		if (m[i][col] >= m[i - 1][col])
 		{
@@ -51,7 +51,6 @@ int foolCheckRC() //функция проверки на ввод пользов
 		{
 			if (num <= Right && num > Left)
 			{
-				printf("Chislo prinyato.\n");
 				return num;
 			}
 			printf("Chislo dolzno bit ot %d do %d.\n", Left, Right);
@@ -67,7 +66,7 @@ int foolCheckRC() //функция проверки на ввод пользов
 int maxCol(int** m, int rows, int cols) //поиск максимального столбца подходящего под условия
 {
 	int j, numcol = -1;
-	for (j = 0;j < cols;j++)
+	for (j = 0; j < cols; j++)
 	{
 		if (checkCol(m, j, rows))
 		{
@@ -104,9 +103,9 @@ void appendNewMatr(int** m, int** new_m, int rows, int cols) //функция д
 void printMatr(int** m, int rows, int cols) //функция для вывода матриц
 {
 	int i, j, x;
-	for (i = 0;i < rows;i++)
+	for (i = 0; i < rows; i++)
 	{
-		for (j = 0;j < cols;j++)
+		for (j = 0; j < cols; j++)
 		{
 			printf("%d ", m[i][j]);
 		}
@@ -118,7 +117,7 @@ void printMatr(int** m, int rows, int cols) //функция для вывода
 void freePamat(int** m, int rows) //функция для очистки памяти
 {
 	int i;
-	for (i = 0;i < rows;i++) 
+	for (i = 0; i < rows; i++)
 	{
 		free(m[i]);
 	}
@@ -129,20 +128,20 @@ void freePamat(int** m, int rows) //функция для очистки пам�
 
 int main()
 {
-	int **m, **new_matr, r, c, i;
-	
+	int** m, ** new_matr, r, c, i;
+
 	printf("Vvedite kolichestvo strok v matritse:\n"); //ввод количество строк и столбцов
 	r = foolCheckRC();
 	printf("Vvedite kolichestvo stolbtsov v matritse:\n");
 	c = foolCheckRC();
-	
+
 	m = (int**)malloc(sizeof(int*) * r); //память для всей матрицы
 	if (m == NULL)
 	{
 		printf("ERROR: Ne ydalos videlit pamat.");
 		return 0;
 	}
-	for (i = 0;i < r;i++) //выделение памяти под каждую строку
+	for (i = 0; i < r; i++) //выделение памяти под каждую строку
 	{
 		m[i] = (int*)malloc(sizeof(int*) * c);
 		if (m[i] == NULL)
@@ -167,7 +166,7 @@ int main()
 		freePamat(m, r); //очистка памяти под матрицу A если нельзя построить B
 		return 0;
 	}
-	
+
 	new_matr = (int**)malloc(sizeof(int*) * r); //память для всей новой матрицы
 	if (new_matr == NULL)
 	{
@@ -175,7 +174,7 @@ int main()
 		freePamat(m, r); //очистка памяти для матрицы A если под B нельзя выделить
 		return 0;
 	}
-	for (i = 0;i < r;i++) //выделение памяти под каждую строку
+	for (i = 0; i < r; i++) //выделение памяти под каждую строку
 	{
 		new_matr[i] = (int*)malloc(sizeof(int*) * (c - 1));
 		if (new_matr[i] == NULL)
@@ -187,7 +186,7 @@ int main()
 	}
 
 	appendNewMatr(m, new_matr, r, c);
-	
+
 	freePamat(m, r); //очистка памяти под матрицу A
 
 	printf("Matritsa B:\n"); //вывод матрицы B
